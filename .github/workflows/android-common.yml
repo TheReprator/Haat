@@ -1,0 +1,70 @@
+name: Android Build (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      build-type:
+        required: true
+        type: string
+      signing-enabled:
+        required: true
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Decode keystore
+        if: ${{ inputs.signing-enabled }}
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > my-release-key.jks
+
+      - name: Create keystore.properties
+        if: ${{ inputs.signing-enabled }}
+        run: |
+          cat > keystore.properties <<EOF
+          storeFile=my-release-key.jks
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.KEYSTORE_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build APK/AAB
+        run: |
+          if [ "${{ inputs.build-type }}" = "release" ]; then
+            ./gradlew clean assembleRelease bundleRelease --no-daemon -Pandroid.injected.testOnly=false
+          else
+            ./gradlew assembleDebug --stacktrace
+          fi
+
+      - name: Upload Outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ inputs.build-type }}-artifacts"
+          path: |
+            app/build/outputs/apk/${{ inputs.build-type }}/*.apk
+            app/build/outputs/bundle/${{ inputs.build-type }}/*.aab
+          if-no-files-found: ignore

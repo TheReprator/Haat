@@ -1,4 +1,4 @@
-package dev.reprator.haat.features.restaurant2pane.restaurants.navigation
+package dev.reprator.haat.features.restaurant2pane.restaurants.presentation.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions

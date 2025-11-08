@@ -8,8 +8,8 @@ import androidx.navigation.navOptions
 import dev.reprator.haat.R
 import dev.reprator.haat.features.comingSoon.navigation.RouteOthers
 import dev.reprator.haat.features.comingSoon.navigation.navigateToComingSoon
-import dev.reprator.haat.features.restaurant2pane.restaurants.navigation.RestaurantsRoute
-import dev.reprator.haat.features.restaurant2pane.restaurants.navigation.navigateToRestaurants
+import dev.reprator.haat.features.restaurant2pane.restaurants.presentation.navigation.RestaurantsRoute
+import dev.reprator.haat.features.restaurant2pane.restaurants.presentation.navigation.navigateToRestaurants
 import kotlin.reflect.KClass
 
 enum class AppLevelDestination(

@@ -1,6 +1,6 @@
 package dev.reprator.haat.util
 
-interface Mapper<in InputModal, out OutputModal> {
+interface Mapper<InputModal, OutputModal> {
     suspend fun map(from: InputModal): OutputModal
 }
 

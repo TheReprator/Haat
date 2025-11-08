@@ -1,4 +1,4 @@
-package dev.reprator.haat.features.restaurant2pane.businessDetail.ui
+package dev.reprator.haat.features.restaurant2pane.businessDetail.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

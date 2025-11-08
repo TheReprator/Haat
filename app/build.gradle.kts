@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +10,19 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.room)
     alias(libs.plugins.kotlin.serialization)
+}
+
+fun loadReleaseProperties(): Properties {
+    val keystorePropertiesFile = rootProject.file("secrets/keystore.properties")
+    val keystoreProperties = Properties()
+
+    if (!keystorePropertiesFile.exists()) {
+        println("keystore.properties not found at: ${keystorePropertiesFile.path}")
+        return keystoreProperties
+    }
+
+    keystoreProperties.load(keystorePropertiesFile.inputStream())
+    return keystoreProperties
 }
 
 android {
@@ -25,23 +41,61 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        val keystoreProperties = loadReleaseProperties()
+
+        if (keystoreProperties.isNotEmpty()) {
+            create("release") {
+                storePassword = keystoreProperties["KEYSTORE_PASSWORD"] as String
+                keyAlias = keystoreProperties["KEY_ALIAS"] as String
+                keyPassword = keystoreProperties["KEY_PASSWORD"] as String
+                val storeFileName = keystoreProperties["STORE_FILE"] as String
+                storeFile = rootProject.file("secrets/$storeFileName")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            if (signingConfigs.names.contains("release")) {
+                signingConfig = signingConfigs.getByName("release")
+            } else {
+                println("build unsigned release.")
+            }
         }
     }
+
+    packaging {
+        resources.excludes.add("META-INF/*")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
-        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    composeCompiler {
+        stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("stability_config.conf"))
+    }
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_21
+            freeCompilerArgs.addAll(
+                "-XXLanguage:+PropertyParamAnnotationDefaultTargetMode",
+
+                "-P", "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true",
+
+                "-P", "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.asFile.get()}/compose_reports",
+                "-P", "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${layout.buildDirectory.asFile.get()}/compose_metrics"
+            )
+        }
     }
 
     buildFeatures {

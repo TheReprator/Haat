@@ -2,6 +2,7 @@ package dev.reprator.haat.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -12,8 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Unspecified
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -21,17 +20,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter.State.Error
 import coil.compose.AsyncImagePainter.State.Loading
 import coil.compose.rememberAsyncImagePainter
 import com.vanniktech.blurhash.BlurHash
 import dev.reprator.haat.R
-import dev.reprator.haat.ui.LocalTintTheme
 
-/**
- * A wrapper around [AsyncImage] which determines the colorFilter based on the theme
- */
+
 @Composable
 fun DynamicAsyncImage(
     imageUrl: String,
@@ -39,7 +34,6 @@ fun DynamicAsyncImage(
     modifier: Modifier = Modifier,
     placeholder: Painter = painterResource(R.drawable.icon_logo),
 ) {
-    val iconTint = LocalTintTheme.current.iconTint
     var isLoading by remember { mutableStateOf(true) }
     var isError by remember { mutableStateOf(false) }
     val imageLoader = rememberAsyncImagePainter(
@@ -66,7 +60,7 @@ fun DynamicAsyncImage(
         Image(
             contentScale = ContentScale.Crop,
             painter = if (isError.not() && !isLocalInspection) imageLoader else placeholder,
-            contentDescription = contentDescription
+            contentDescription = contentDescription,
         )
     }
 }
@@ -75,11 +69,10 @@ fun DynamicAsyncImage(
 fun DynamicAsyncImage(
     imageUrl: String,
     contentDescription: String?,
-    blurHash: String,
+    blurHash: String?,
     modifier: Modifier = Modifier,
     logoPlaceholder: Painter = painterResource(R.drawable.icon_logo),
 ) {
-    val iconTint = LocalTintTheme.current.iconTint
     var isError by remember { mutableStateOf(false) }
 
     val imageLoader = rememberAsyncImagePainter(
@@ -91,7 +84,7 @@ fun DynamicAsyncImage(
 
     val placeholder = remember(blurHash) {
         val bitmap = try {
-            BlurHash.decode(blurHash, 200, 200)
+            BlurHash.decode(blurHash!!, 200, 200)
         } catch (e: Exception) {
             null
         }
@@ -105,17 +98,16 @@ fun DynamicAsyncImage(
     ) {
         val painter = if (isError && placeholder != null) {
             placeholder
-        }
-        else if(isError) {
+        } else if (isError) {
             logoPlaceholder
         } else {
             imageLoader
         }
         Image(
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize(),
             painter = painter,
-            contentDescription = contentDescription,
-            colorFilter = if (iconTint != Unspecified) ColorFilter.tint(iconTint) else null,
+            contentDescription = contentDescription
         )
     }
 }

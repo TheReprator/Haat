@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.reprator.haat.features.restaurant2pane.restaurants.navigation.RestaurantsRoute
+import dev.reprator.haat.features.restaurant2pane.restaurants.presentation.navigation.RestaurantsRoute
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 

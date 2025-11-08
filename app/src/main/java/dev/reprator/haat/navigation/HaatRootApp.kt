@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import dev.reprator.haat.features.comingSoon.navigation.RouteOthers
 import dev.reprator.haat.features.comingSoon.navigation.navigateToComingSoon
 import dev.reprator.haat.features.restaurant2pane.restaurantListDetailScreen
-import dev.reprator.haat.features.restaurant2pane.restaurants.navigation.RestaurantsRoute
+import dev.reprator.haat.features.restaurant2pane.restaurants.presentation.navigation.RestaurantsRoute
 
 
 @Composable
@@ -44,7 +44,8 @@ fun HaatNavHost(
         startDestination = RestaurantsRoute,
         modifier = modifier,
     ) {
-        restaurantListDetailScreen()
+       restaurantListDetailScreen()
+
         navigateToComingSoon<RouteOthers.Orders>()
         navigateToComingSoon<RouteOthers.Profile>()
         navigateToComingSoon<RouteOthers.Market>()

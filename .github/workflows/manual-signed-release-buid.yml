@@ -1,0 +1,13 @@
+name: Android Release Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  release-build:
+    uses: ./.github/workflows/android-common.yml
+    with:
+      build-type: "release"
+      signing-enabled: true

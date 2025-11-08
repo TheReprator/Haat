@@ -1,0 +1,14 @@
+name: Android Debug Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  debug-build:
+    uses: ./.github/workflows/android-common.yml
+    with:
+      build-type: "debug"
+      signing-enabled: false

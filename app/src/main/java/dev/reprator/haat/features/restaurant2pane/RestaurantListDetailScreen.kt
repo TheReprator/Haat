@@ -37,11 +37,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import dev.reprator.haat.features.restaurant2pane.businessDetail.navigation.BusinessDetailRoute
-import dev.reprator.haat.features.restaurant2pane.businessDetail.ui.BusinessDetailPlaceholder
-import dev.reprator.haat.features.restaurant2pane.businessDetail.ui.BusinessDetailScreen
-import dev.reprator.haat.features.restaurant2pane.restaurants.navigation.RestaurantsRoute
-import dev.reprator.haat.features.restaurant2pane.restaurants.ui.RestaurantScreen
+import dev.reprator.haat.features.restaurant2pane.businessDetail.presentation.StoreInfoViewModel
+import dev.reprator.haat.features.restaurant2pane.businessDetail.presentation.navigation.BusinessDetailRoute
+import dev.reprator.haat.features.restaurant2pane.businessDetail.presentation.ui.BusinessDetailPlaceholder
+import dev.reprator.haat.features.restaurant2pane.businessDetail.presentation.ui.StoreInfoScreen
+import dev.reprator.haat.features.restaurant2pane.restaurants.presentation.navigation.RestaurantsRoute
+import dev.reprator.haat.features.restaurant2pane.restaurants.presentation.ui.RestaurantScreen
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlin.math.max
@@ -110,13 +111,13 @@ internal fun RestaurantListDetailScreen(
     }
 
     var restaurantRoute by remember {
-        val route = selectedRestaurantID?.let { BusinessDetailRoute(id = it) } ?: RestaurantPlaceholderRoute
+        val route = selectedRestaurantID?.let { BusinessDetailRoute(storeId = it) } ?: RestaurantPlaceholderRoute
         mutableStateOf(route)
     }
 
-    fun onTopicClickShowDetailPane(selectedRestaurantID: String) {
+    fun onStoreClickShowDetailPane(selectedRestaurantID: String) {
         onRestaurantClick(selectedRestaurantID)
-        restaurantRoute = BusinessDetailRoute(id = selectedRestaurantID)
+        restaurantRoute = BusinessDetailRoute(storeId = selectedRestaurantID)
         coroutineScope.launch {
             listDetailNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
         }
@@ -153,7 +154,7 @@ internal fun RestaurantListDetailScreen(
                         },
                 ) {
                     RestaurantScreen(
-                        onBusinessClick =::onTopicClickShowDetailPane,
+                        onBusinessClick =::onStoreClickShowDetailPane,
                         shouldHighlightSelectedBusiness = listDetailNavigator.isDetailPaneVisible())
                 }
             }
@@ -182,13 +183,18 @@ internal fun RestaurantListDetailScreen(
                     AnimatedContent(restaurantRoute) { route ->
                         when (route) {
                             is BusinessDetailRoute -> {
-                                BusinessDetailScreen(
+                                StoreInfoScreen(
                                     showBackButton = !listDetailNavigator.isListPaneVisible(),
                                     onBackClick = {
                                         coroutineScope.launch {
                                             listDetailNavigator.navigateBack()
                                         }
-                                    }
+                                    },
+                                    viewModel = hiltViewModel<StoreInfoViewModel, StoreInfoViewModel.Factory>(
+                                        key = route.storeId,
+                                    ) { factory ->
+                                        factory.create(route.storeId)
+                                    },
                                 )
                             }
                             is RestaurantPlaceholderRoute -> {

@@ -1,6 +1,7 @@
 package dev.reprator.haat.util.base.mvi
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -32,7 +33,11 @@ interface Reducer<S : UiState, A : UiAction, E : SideEffect> {
 
 typealias ActionDispatcher<A> = (A) -> Unit
 
-interface Middleware<S : UiState, A : UiAction, E : SideEffect> {
+interface Middleware<S : UiState, A : UiAction, E : SideEffect>: CoroutineScope, AutoCloseable {
     fun onAction(action: A, state: S)
     fun attach(dispatcher: ActionDispatcher<A>)
+
+    override fun close() {
+        coroutineContext.cancelChildren()
+    }
 }

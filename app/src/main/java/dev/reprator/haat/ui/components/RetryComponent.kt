@@ -22,9 +22,7 @@ fun WidgetRetry(
     modifier: Modifier = Modifier
 ) {
     Column(
-        Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
+        modifier = modifier,
         verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(onClick = {

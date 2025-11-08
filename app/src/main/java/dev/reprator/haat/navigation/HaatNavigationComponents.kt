@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavDestination
@@ -177,15 +178,22 @@ fun HaatBottomNavigationBar(
 ) {
     NavigationBar(modifier = Modifier.fillMaxWidth()) {
         AppLevelDestination.entries.forEach { haatDestination ->
-            val isSelected = currentDestination.hasRoute(haatDestination)
             NavigationBarItem(
-                alwaysShowLabel = true,
                 selected = currentDestination.hasRoute(haatDestination),
                 onClick = { navigateToTopLevelDestination(haatDestination) },
                 icon = {
                     Icon(
                         painter = painterResource(id = haatDestination.selectedIconId),
                         contentDescription = stringResource(id = haatDestination.iconTextId),
+                    )
+                },
+                label = {
+                    Text(
+                        text = stringResource(id = haatDestination.iconTextId),
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 16.dp),
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
