@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Haat</string>
+    <string name="nav_restaurant">Restaurants</string>
+    <string name="nav_market">Market</string>
+    <string name="nav_cart">My Cart</string>
+    <string name="nav_orders">My Orders</string>
+    <string name="nav_profile">Profile</string>
+    <string name="business_select_placeholder">Select a restaurant</string>
+
+    <string name="app_retry">Retry</string>
+    <string name="app_error_generic">An Error occurred</string>
+</resources>
